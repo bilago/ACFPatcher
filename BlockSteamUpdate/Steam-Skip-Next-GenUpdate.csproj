@@ -20,4 +20,10 @@
     <Content Include="Fallout4Launcher_246.ico" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Fallout4_NextGen_GameInfo.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
