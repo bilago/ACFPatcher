@@ -1,23 +1,76 @@
 ﻿using Microsoft.Win32;
+using SteamSkipNextGenUpdate.Models;
 using System.Diagnostics;
+using System.Net.NetworkInformation;
 
 class Program
 {
-    static Dictionary<string, string> ReplaceDict()
+    static void Main(string[] args)
     {
-        return new Dictionary<string, string>()
+        try
         {
-            {"\"buildid\"\t\t\"4460038\"", "\"buildid\"\t\t\"14160910\"" },
-            {"\"AutoUpdateBehavior\"\t\t\"0\"", "\"AutoUpdateBehavior\"\t\t\"1\"" },
-            {"\"ScheduledAutoUpdate\"\t\t\"1\"","\"ScheduledAutoUpdate\"\t\t\"0\"" },
-            {"\"manifest\"\t\t\"7497069378349273908\"","\"manifest\"\t\t\"7332110922360867314\"" },
-            {"\"manifest\"\t\t\"5847529232406005096\"","\"manifest\"\t\t\"3747866029627240371\"" },
-            {"\"manifest\"\t\t\"5819088023757897745\"","\"manifest\"\t\t\"3876298980394425306\"" },
-            {"\"manifest\"\t\t\"2178106366609958945\"","\"manifest\"\t\t\"8492427313392140315\"" },
-            {"\"manifest\"\t\t\"1691678129192680960\"","\"manifest\"\t\t\"1213339795579796878\"" },
-            {"\"manifest\"\t\t\"5106118861901111234\"","\"manifest\"\t\t\"7785009542965564688\"" },
-            {"\"manifest\"\t\t\"1255562923187931216\"","\"manifest\"\t\t\"366079256218893805\"" }
-        };
+            var gameDict = new Dictionary<string, GameInfo>();
+            var gameList = new List<string>();
+            GameInfo? selectedGame = null;
+            foreach (var file in Directory.GetFiles(Environment.CurrentDirectory, "*_GameInfo.json"))
+            {
+                try
+                {
+                    var game = GameInfo.FromFile(file);
+                    if (game?.Name is null) continue;
+                    gameDict[game.Name] = game;
+                    gameList.Add(game.Name);
+                    Console.WriteLine("\n\n");
+                    Console.WriteLine("ACF File Patcher - By Bilago");
+                    Console.WriteLine("Choose a game to prevent steam updates:");
+                    var place = 1;
+                    foreach (var g in gameList)
+                    {
+                        Console.WriteLine($"{place++}. {g}");
+                    }
+                    Console.WriteLine("Q. Quit Application");
+
+                    while (selectedGame is null)
+                    {
+                        Console.WriteLine();
+                        switch (Console.ReadKey().KeyChar)
+                        {
+                            case 'q':
+                            case 'Q':
+                                return;
+                            case char c when char.IsDigit(c):
+                                var selection = int.Parse(c.ToString());
+                                if (selection > gameList.Count || selection < 1)
+                                {
+                                    Console.WriteLine("Invalid selection, please try again");
+                                    continue;
+                                }
+                                selectedGame = gameDict[gameList[selection - 1]];
+                                break;
+                            default:
+                                Console.WriteLine("Invalid selection, please try again");
+                                continue;
+                        }
+                    }
+                }
+                catch
+                {
+
+                }
+            }
+            if (selectedGame is null)
+            {
+                Console.WriteLine("No game was selected, please try running this application again");
+                return;
+            }
+            PatchAcf(selectedGame);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        Console.WriteLine("Finished. Press any key to exit");
+        Console.ReadKey();
     }
 
     public static void SetReadOnly(string file)
@@ -63,28 +116,25 @@ class Program
             Console.WriteLine(ex.Message);
         }
     }
-    private static string GetManifestDirectory()
+    private static string? GetManifestDirectory(GameInfo game)
     {
         try
         {
-            var fileName = "appmanifest_377160.acf";
-            if (File.Exists("Fallout4.exe") && Environment.CurrentDirectory.Contains("common\\Fallout 4"))
+            if (game is null)
+                return null;
+            var fileName =$"appmanifest_{game.AppId}.acf";
+            var pathReplaceStr = $"common\\{game.Name}";
+            if (File.Exists(game.Binary) && Environment.CurrentDirectory.Contains(pathReplaceStr))
             {
                 Console.WriteLine($"File was ran from the game directory, using {Environment.CurrentDirectory}");
-                var fullPath =  Path.Combine(Environment.CurrentDirectory.Replace("common\\Fallout 4", ""), fileName);
+                var fullPath =  Path.Combine(Environment.CurrentDirectory.Replace(pathReplaceStr, ""), fileName);
                 if (File.Exists(fullPath))
                     return fullPath;
             }
-            // Registry key paths for Fallout 4 installation
-            string[] registryKeyPaths = new string[]
-            {
-            @"SOFTWARE\WOW6432Node\Bethesda Softworks\Fallout4",
-            @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 377160"
-            };
+            
 
-            string installDir = null;
-
-            foreach (var registryKeyPath in registryKeyPaths)
+            string? installDir = null;
+            foreach (var registryKeyPath in game.RegistryLocations)
             {
                 installDir = GetInstallDirFromRegistry(registryKeyPath);
                 if (!string.IsNullOrEmpty(installDir))
@@ -95,12 +145,12 @@ class Program
 
             if (string.IsNullOrEmpty(installDir))
             {
-                Console.WriteLine("Fallout 4 installation directory not found in registry.");
+                Console.WriteLine($"{game.Name} installation directory not found in registry.");
                 return null;
             }
 
             // Construct the path to the Steam manifest file
-            string steamManifestPath = Path.Combine(installDir.Replace("common\\Fallout 4", ""), fileName);
+            string steamManifestPath = Path.Combine(installDir.Replace(pathReplaceStr, ""), fileName);
 
             if (!File.Exists(steamManifestPath))
             {
@@ -115,69 +165,95 @@ class Program
             return null;
         }
     }
-    static void Main(string[] args)
+
+    private static void PatchAcf(GameInfo? game)
     {
-        try
+        var steamManifestPath = GetManifestDirectory(game) ?? throw new Exception("Could not locate the manifest file on your machine. Place this exe in your fallout 4 directory for detection");
+        Console.Clear();
+        Console.WriteLine("\n");
+        Console.WriteLine($"Manifest Location: {steamManifestPath}");
+        var backupFile = $"{steamManifestPath}.backup_{DateTime.Now:ddmmyyyyhhMMss}";
+        Console.WriteLine($"Backup Location: {backupFile}");
+        Console.WriteLine("\nPress Y to start or any other key to abort.");
+        var key = Console.ReadKey();
+        Console.WriteLine();
+        if (key.Key != ConsoleKey.Y)
         {
-            var steamManifestPath = GetManifestDirectory() ?? throw new Exception("Could not locate the manifest file on your machine. Place this exe in your fallout 4 directory for detection");            
-            var backupFile = $"{steamManifestPath}.backup_{DateTime.Now.ToString("ddmmyyyyhhMMss")}";
+            Console.WriteLine($"Execution aborted, press any key to exit");
+            Console.ReadKey();
+            return;
+        }
 
-            Console.WriteLine($"Manifest Location: {steamManifestPath}");
-            Console.WriteLine($"Backup Location: {backupFile}");
-            Console.WriteLine("Press Y to start or any other key to abort.");
-            var key = Console.ReadKey();
-            Console.WriteLine();
-            if(key.Key != ConsoleKey.Y)
+        Console.WriteLine("Shutting down steam");
+        var steamFilePath = KillProcess("Steam");
+
+        File.Copy(steamManifestPath, backupFile, true);
+        Console.WriteLine($"Manifest file backed up to {backupFile}");
+
+        var acf = AppState.Deserialize(steamManifestPath);
+        bool hasChanges = false;
+        foreach (var item in game.Main)
+        {
+            if (acf.Main.TryGetValue(item.Key, out var val))
             {
-                Console.WriteLine($"Execution aborted, press any key to exit");
-                Console.ReadKey();
-                return;
-            }
-
-            Console.WriteLine("Shutting down steam");
-            var steamFilePath = KillProcess("Steam");
-
-            File.Copy(steamManifestPath, backupFile, true);
-            Console.WriteLine($"Manifest file backed up to {backupFile}");
-
-            // Read the manifest file content
-            var manifestContent = File.ReadAllText(steamManifestPath);
-            foreach (var item in ReplaceDict())
-            {
-                if (manifestContent.Contains(item.Key))
+                if (val != item.Value)
                 {
-                    manifestContent = manifestContent.Replace(item.Key, item.Value);
-                    Console.WriteLine($"Replaced {item.Key} with {item.Value}");
+                    acf.Main[item.Key] = item.Value;
+                    Console.WriteLine($"Changed value for {item.Key} from {val} to {item.Value}");
+                    hasChanges = true;
                 }
-            }
-            RemoveReadOnly(steamManifestPath);
-            File.Delete(steamManifestPath);
-            File.WriteAllText(steamManifestPath, manifestContent);
-            SetReadOnly(steamManifestPath);
-
-            var started = false;
-            if (steamFilePath != null && File.Exists(steamFilePath))
-            {
-                
-                Process.Start(steamFilePath);
-                started = true;
+                continue;
             }
             else
             {
-                if (File.Exists("C:\\Program Files\\Steam\\Steam.exe"))
-                {
-                    Process.Start("C:\\Program Files\\Steam\\Steam.exe");
-                    started = true;
-                }
+                acf.Main[item.Key] = item.Value;
+                Console.WriteLine($"Setting was missing. Added key {item.Key} with value {item.Value}");
+                hasChanges = true;
             }
-            Console.WriteLine($"Manifest file updated successfully. {(started ? "Steam restarted" : "Could not start steam, please launch manually")}");
         }
-        catch (Exception ex)
+        foreach (var item in game.DepotManifests)
         {
-            Console.WriteLine(ex.Message);
+            if (acf.InstalledDepots.TryGetValue(item.Key, out var val))
+            {
+                if (val.manifest != item.Value)
+                {
+                    Console.WriteLine($"Changed Depo Manifest value for {item.Key} from {val.manifest} to {item.Value}");
+                    acf.InstalledDepots[item.Key].manifest = item.Value;
+                    hasChanges = true;
+                }
+                continue;
+            }
+            else
+            {
+                acf.Main[item.Key] = item.Value;
+                Console.WriteLine($"Setting was missing. Added key {item.Key} with value {item.Value}");
+                hasChanges = true;
+            }
         }
-        Console.WriteLine("Finished. Press any key to exit");
-        Console.ReadKey();
+        if (hasChanges)
+        {
+            RemoveReadOnly(steamManifestPath);
+            File.Delete(steamManifestPath);
+            File.WriteAllText(steamManifestPath, AppState.Serialize(acf));
+            SetReadOnly(steamManifestPath);
+        }
+        var started = false;
+        if (steamFilePath != null && File.Exists(steamFilePath))
+        {
+
+            Process.Start(steamFilePath);
+            started = true;
+        }
+        else
+        {
+            if (File.Exists("C:\\Program Files\\Steam\\Steam.exe"))
+            {
+                Process.Start("C:\\Program Files\\Steam\\Steam.exe");
+                started = true;
+            }
+        }
+
+        Console.WriteLine($"Manifest file {(hasChanges ? "updated successfully": "Required no changes (file is not modified)")}.\n{(started ? "Steam restarted" : "Could not start steam, please launch manually")}");
     }
 
     private static string? KillProcess(string name)

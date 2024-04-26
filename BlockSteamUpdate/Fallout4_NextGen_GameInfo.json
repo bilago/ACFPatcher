@@ -1,0 +1,23 @@
+{
+  "Name": "Fallout 4",
+  "Binary": "Fallout4.exe",
+  "AppId": "377160",
+  "RegistryLocations": [
+    "SOFTWARE\\WOW6432Node\\Bethesda Softworks\\Fallout4",
+    "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 377160"
+  ],
+  "Main": {
+    "buildid": "14160910",
+    "AutoUpdateBehavior": "1",
+    "ScheduledAutoUpdate": "0"
+  },
+  "DepotManifests": {
+    "377161": "7332110922360867314",
+    "377162": "3747866029627240371",
+    "377163": "3876298980394425306",
+    "377164": "8492427313392140315",
+    "435870": "1213339795579796878",
+    "435871": "7785009542965564688",
+    "435880": "366079256218893805"
+  }
+}
