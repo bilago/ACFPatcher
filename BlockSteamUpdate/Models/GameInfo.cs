@@ -10,6 +10,9 @@ namespace SteamSkipNextGenUpdate.Models
         public List<string> RegistryLocations { get; set; } = new();
         public Dictionary<string, string> Main { get; set; } = new();
         public Dictionary<string, string> DepotManifests { get; set; } = new();
+        public List<string> MandatoryDepots { get; set; } = new();
+        public Dictionary<string, string> LanguageSpecificDepots { get; set; } = new();
+        public Dictionary<string, string> DLCDepots { get; set; } = new();
         public static GameInfo? FromFile(string filename)
         {
             try

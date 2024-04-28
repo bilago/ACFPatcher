@@ -1,4 +1,4 @@
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using SteamSkipNextGenUpdate.Models;
 using System.Diagnostics;
 using System.IO;

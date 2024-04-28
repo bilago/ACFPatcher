@@ -245,101 +245,108 @@ public class AppState
     public Dictionary<string, string> Main { get; set; } = new();
 
 
-    public static AppState Deserialize(string filePath)
+    public static AppState? Deserialize(string filePath)
     {
-        var appState = new AppState();
-        var installedDepots = new Dictionary<string, InstalledDepot>();
-        var installScripts = new Dictionary<string, string>();
-        var sharedDepots = new Dictionary<string, string>();
-        var userConfig = new Dictionary<string, string>();
-        var mountedConfig = new Dictionary<string, string>();
-        var main = new Dictionary<string, string>();
-
-        using var reader = new StreamReader(filePath);
-        string? line;
-        while ((line = reader?.ReadLine()) != null)
+        try
         {
-            if (line.Contains('{') || line.Contains('}'))
-                continue;
+            var appState = new AppState();
+            var installedDepots = new Dictionary<string, InstalledDepot>();
+            var installScripts = new Dictionary<string, string>();
+            var sharedDepots = new Dictionary<string, string>();
+            var userConfig = new Dictionary<string, string>();
+            var mountedConfig = new Dictionary<string, string>();
+            var main = new Dictionary<string, string>();
 
-            var keyValue = line.Split(new[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
-            var key = keyValue[0].Trim('\"');
-            if (keyValue.Length == 2)
+            using var reader = new StreamReader(filePath);
+            string? line;
+            while ((line = reader?.ReadLine()) != null)
             {
-                main[key] = keyValue[1].Trim('\"');
-            }
-            else
-            {
-                var bracketCount = 0;
-                switch (key)
+                if (line.Contains('{') || line.Contains('}'))
+                    continue;
+
+                var keyValue = ToKVP(line);
+                var key = keyValue.Key;
+                if (keyValue.Value is not null)
                 {
-                    case "InstalledDepots":
-                        string? currentDepoId = null;
-                        while ((line = reader?.ReadLine()) != null)
-                        {
-                            if (line.Contains('{'))
+                    main[key] = keyValue.Value;
+                }
+                else
+                {
+                    var bracketCount = 0;
+                    switch (key)
+                    {
+                        case "InstalledDepots":
+                            string? currentDepoId = null;
+                            while ((line = reader?.ReadLine()) != null)
                             {
-                                bracketCount++;
-                                continue;
-                            }
-                            else if (line.Contains('}'))
-                            {
-                                bracketCount--;
-                                if (bracketCount == 0)
-                                    break;
-                                continue;
-                            }
+                                if (line.Contains('{'))
+                                {
+                                    bracketCount++;
+                                    continue;
+                                }
+                                else if (line.Contains('}'))
+                                {
+                                    bracketCount--;
+                                    if (bracketCount == 0)
+                                        break;
+                                    continue;
+                                }
 
-                            var kv = line.Split(new[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                            var k = kv[0].Trim('\"');
-                            if (kv.Length == 1)
-                            {
-                                currentDepoId = k;
-                                continue;
+                                var kv = ToKVP(line);
+                                var k = kv.Key;
+                                if (kv.Value is null)
+                                {
+                                    currentDepoId = k;
+                                    continue;
+                                }
+                                if (currentDepoId is null)
+                                    continue;
+                                var v = kv.Value;
+                                if (!installedDepots.ContainsKey(currentDepoId))
+                                    installedDepots[currentDepoId] = new();
+                                switch (k)
+                                {
+                                    case "manifest":
+                                        installedDepots[currentDepoId].manifest = v;
+                                        break;
+                                    case "size":
+                                        installedDepots[currentDepoId].size = v;
+                                        break;
+                                    case "dlcappid":
+                                        installedDepots[currentDepoId].dlcappid = v;
+                                        break;
+                                }
                             }
-                            if (currentDepoId is null)
-                                continue;
-                            var v = kv[1].Trim('\"');
-                            if (!installedDepots.ContainsKey(currentDepoId))
-                                installedDepots[currentDepoId] = new();
-                            switch (k)
-                            {
-                                case "manifest":
-                                    installedDepots[currentDepoId].manifest = v;
-                                    break;
-                                case "size":
-                                    installedDepots[currentDepoId].size = v;
-                                    break;
-                                case "dlcappid":
-                                    installedDepots[currentDepoId].dlcappid = v;
-                                    break;
-                            }
-
-                        }
-                        break;
-                    case "UserConfig":
-                        ParseDictionary(reader, userConfig);
-                        break;
-                    case "SharedDepots":
-                        ParseDictionary(reader, sharedDepots);
-                        break;
-                    case "MountedConfig":
-                        ParseDictionary(reader, mountedConfig);
-                        break;
-                    case "InstallScripts":
-                        ParseDictionary(reader, installScripts);
-                        break;
+                            break;
+                        case "UserConfig":
+                            ParseDictionary(reader, userConfig);
+                            break;
+                        case "SharedDepots":
+                            ParseDictionary(reader, sharedDepots);
+                            break;
+                        case "MountedConfig":
+                            ParseDictionary(reader, mountedConfig);
+                            break;
+                        case "InstallScripts":
+                            ParseDictionary(reader, installScripts);
+                            break;
+                    }
                 }
             }
-        }
 
-        appState.InstalledDepots = installedDepots;
-        appState.InstallScripts = installScripts;
-        appState.SharedDepots = sharedDepots;
-        appState.UserConfig = userConfig;
-        appState.MountedConfig = mountedConfig;
-        appState.Main = main;
-        return appState;
+            appState.InstalledDepots = installedDepots;
+            appState.InstallScripts = installScripts;
+            appState.SharedDepots = sharedDepots;
+            appState.UserConfig = userConfig;
+            appState.MountedConfig = mountedConfig;
+            appState.Main = main;
+            return appState;
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine(ex);
+            return null;
+        }
     }
 
     private static void ParseDictionary(StreamReader? reader, Dictionary<string, string> dict)
@@ -363,74 +370,95 @@ public class AppState
                     break;
                 continue;
             }
-            var kv = line.Split(new[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
-
-            var k = kv[0].Trim('\"');
-            var v = kv[1].Trim('\"');
-            dict[k] = v;
+            var kv = ToKVP(line);
+            dict[kv.Key] = kv.Value;
         }
     }
 
-    public static string Serialize(AppState appState)
+    private static KeyValuePair<string, string?> ToKVP(string line)
     {
-        StringWriter sw = new();
+        var res = line?.Split(new[] { '\t' }, StringSplitOptions.RemoveEmptyEntries)?.Select(x => x.Trim('\"'));
+        if (res is null)
+            return new KeyValuePair<string, string?>("", null);
+        if (res?.Count() == 1)
+            return new KeyValuePair<string, string?>(res.First(), null);
+        return new KeyValuePair<string, string?>(res.First(), res.Last());
+    }
 
-        // Start the AppState section
-        sw.WriteLine("\"AppState\"");
-        sw.WriteLine("{");
-        foreach(var item in appState.Main)
+    public static string? Serialize(AppState appState)
+    {
+        try
         {
-            SerializeProperty(sw, item.Key, item.Value);
-        }       
+            StringWriter sw = new();
 
-        // Serialize InstalledDepots
-        sw.WriteLine("\t\"InstalledDepots\"");
-        sw.WriteLine("\t{");
-        foreach (var depot in appState.InstalledDepots)
-        {
-            sw.WriteLine($"\t\t\"{depot.Key}\"");
-            sw.WriteLine("\t\t{");
-            SerializeProperty(sw, "manifest", depot.Value.manifest, 3);
-            SerializeProperty(sw, "size", depot.Value.size, 3);
-            SerializeProperty(sw, "dlcappid", depot.Value.dlcappid, 3);
-            sw.WriteLine("\t\t}");
+            // Start the AppState section
+            sw.WriteLine("\"AppState\"");
+            sw.WriteLine("{");
+            foreach (var item in appState.Main)
+            {
+                SerializeProperty(sw, item.Key, item.Value);
+            }
+
+            // Serialize InstalledDepots
+            sw.WriteLine("\t\"InstalledDepots\"");
+            sw.WriteLine("\t{");
+            foreach (var depot in appState.InstalledDepots)
+            {
+                sw.WriteLine($"\t\t\"{depot.Key}\"");
+                sw.WriteLine("\t\t{");
+                SerializeProperty(sw, "manifest", depot.Value.manifest, 3);
+                SerializeProperty(sw, "size", depot.Value.size, 3);
+                SerializeProperty(sw, "dlcappid", depot.Value.dlcappid, 3);
+                sw.WriteLine("\t\t}");
+            }
+            sw.WriteLine("\t}");
+
+            // Serialize InstallScripts
+            sw.WriteLine("\t\"InstallScripts\"");
+            sw.WriteLine("\t{");
+            foreach (var script in appState.InstallScripts)
+            {
+                SerializeProperty(sw, script.Key, script.Value, 2);
+            }
+            sw.WriteLine("\t}");
+
+            // Serialize SharedDepots
+            sw.WriteLine("\t\"SharedDepots\"");
+            sw.WriteLine("\t{");
+            foreach (var sharedDepot in appState.SharedDepots)
+            {
+                SerializeProperty(sw, sharedDepot.Key, sharedDepot.Value, 2);
+            }
+            sw.WriteLine("\t}");
+
+            // Serialize UserConfig
+            sw.WriteLine("\t\"UserConfig\"");
+            sw.WriteLine("\t{");
+            foreach(var cfg in appState.UserConfig)
+            {
+                SerializeProperty(sw, cfg.Key, cfg.Value, 2);
+            }          
+            sw.WriteLine("\t}");
+
+            // Serialize MountedConfig
+            sw.WriteLine("\t\"MountedConfig\"");
+            sw.WriteLine("\t{");
+            foreach (var mounted in appState.MountedConfig)
+            {
+                SerializeProperty(sw, mounted.Key, mounted.Value, 2);
+            }
+            sw.WriteLine("\t}");
+
+            // End the AppState section
+            sw.WriteLine("}");
+
+            return sw.ToString();
         }
-        sw.WriteLine("\t}");
-
-        // Serialize InstallScripts
-        sw.WriteLine("\t\"InstallScripts\"");
-        sw.WriteLine("\t{");
-        foreach (var script in appState.InstallScripts)
+        catch(Exception ex)
         {
-            SerializeProperty(sw, script.Key, script.Value, 2);
+            Console.WriteLine(ex.Message);
+            return null;
         }
-        sw.WriteLine("\t}");
-
-        // Serialize SharedDepots
-        sw.WriteLine("\t\"SharedDepots\"");
-        sw.WriteLine("\t{");
-        foreach (var sharedDepot in appState.SharedDepots)
-        {
-            SerializeProperty(sw, sharedDepot.Key, sharedDepot.Value, 2);
-        }
-        sw.WriteLine("\t}");
-
-        // Serialize UserConfig
-        sw.WriteLine("\t\"UserConfig\"");
-        sw.WriteLine("\t{");
-        SerializeProperty(sw, "language", appState.UserConfig["language"], 2);
-        SerializeProperty(sw, "DisabledDLC", appState.UserConfig["DisabledDLC"], 2);
-        sw.WriteLine("\t}");
-
-        // Serialize MountedConfig
-        sw.WriteLine("\t\"MountedConfig\"");
-        sw.WriteLine("\t{");
-        sw.WriteLine("\t}");
-
-        // End the AppState section
-        sw.WriteLine("}");
-
-        return sw.ToString();
     }
 
     private static void SerializeProperty(StringWriter sw, string key, string value, int indentationLevel = 1)

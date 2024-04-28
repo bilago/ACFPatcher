@@ -6,6 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <ApplicationIcon>Fallout4Launcher_246.ico</ApplicationIcon>
+    <AssemblyVersion>1.0.0.10</AssemblyVersion>
+    <NeutralLanguage>af-ZA</NeutralLanguage>    
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -22,6 +24,9 @@
 
   <ItemGroup>
     <None Update="Fallout4_NextGen_GameInfo.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Fallout4_CreationKit_GameInfo.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
