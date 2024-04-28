@@ -10,6 +10,7 @@ class Program
     private const string divider = "===============================================================";
     private const string InputHeader = "\t\t\t\t> ";
     private static string LogFile = $"AcfPatchTool_{DateTime.Now:MM-dd-yyyy hhmmss}.log";
+    private const int IndentCount = 4;
     private static List<string> Output = new();
     
     static void Main(string[] args)
@@ -449,7 +450,7 @@ class Program
             }
             if (c.HasValue)
                 Console.ForegroundColor = c.Value;
-            if (center) message = "\t\t\t\t" + message;
+            if (center) message = new string('\t', IndentCount) + message;
             Console.WriteLine(message);
             if (c.HasValue)
                 Console.ResetColor();
