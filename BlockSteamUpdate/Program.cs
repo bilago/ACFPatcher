@@ -1,12 +1,17 @@
 ﻿using Microsoft.Win32;
+using SteamDisableGameUpdateTool.Helpers;
 using SteamSkipNextGenUpdate.Models;
 using System.Diagnostics;
-using System.IO;
 using System.Reflection;
 using System.Text;
 
 class Program
 {
+    private const string divider = "===============================================================";
+    private const string InputHeader = "\t\t\t\t> ";
+    private static string LogFile = $"AcfPatchTool_{DateTime.Now:MM-dd-yyyy hhmmss}.log";
+    private static List<string> Output = new();
+    
     static void Main(string[] args)
     {
         try
@@ -23,25 +28,28 @@ class Program
                     gameDict[game.Name] = game;
                     gameList.Add(game.Name);
                 }
-                catch { }
+                catch(Exception ex)
+                {
+                    WriteConsole($"{file} cannot be read. Please download the patch tool again or replace this file with a working one. {ex.Message}", ConsoleColor.Red, false);
+                }
             }
             try
             {
                 WriteConsole("\n\n");
 
-                WriteConsole("=======================================");
+                WriteConsole(divider);
                 WriteConsole($"ACF File Patcher - By Bilago v{Assembly.GetEntryAssembly()?.GetName().Version}");
-                WriteConsole("=======================================");
+                WriteConsole(divider);
                 WriteConsole();
                 if (gameList.Count == 0) 
                     throw new Exception("No Game .Json found, please download this tool again and include all the files in the archive.");
 
                 WriteConsole("Choose a game to prevent steam updates:");
                 WriteConsole();
-                var place = 1;
-                foreach (var g in gameList)
+                
+                for (var i = 0; i < gameList.Count; i++)                
                 {
-                    WriteConsole($"{place++}. {g}");
+                    WriteConsole($"{i + 1}. {gameList[i]}");
                 }
                 WriteConsole("Q. Quit Application");
 
@@ -101,8 +109,7 @@ class Program
                     break;
             }
         }
-    }
-    private static string LogFile = $"AcfPatchTool_{DateTime.Now:MM-dd-yyyy hhmmss}.log";
+    }    
 
     private static void RestoreBacup(List<FileInfo> backFiles, string manifestFile)
     {
@@ -150,7 +157,7 @@ class Program
                 WriteConsole();
                 ReplaceFile(selectedBackup.FullName, manifestFile);
                 WriteConsole("File has been restored! Restarting steam");
-                if (!StartProcess(KillProcess("Steam")))
+                if (!StartProcess(ProcessEx.KillProcess("Steam")))
                     WriteConsole("Could not start steam", ConsoleColor.Red);
             }
         }
@@ -179,6 +186,7 @@ class Program
         catch
         { return false; }
     }
+
     private static bool AreYouSure()
     {
         WriteConsole();
@@ -187,21 +195,11 @@ class Program
         return Console.ReadKey().Key == ConsoleKey.Y;
     }
 
-    public static void SetReadOnly(string file)
+    private static void SetReadOnly(string file)
     {
         try
         {
-            if (!File.Exists(file))
-                return;
-            var finfo = new FileInfo(file);
-            if (finfo.IsReadOnly)
-                return;
-
-            var attr = File.GetAttributes(file);
-
-            // set read-only
-            attr = attr | FileAttributes.ReadOnly;
-            File.SetAttributes(file, attr);
+            DirectoryEx.SetReadOnly(file);
             WriteConsole($"Set {file} to read only");
             
         }
@@ -210,28 +208,12 @@ class Program
             WriteConsole(ex.Message, ConsoleColor.Red, false);
         }
     }
-    private static string TraverseDirectory(string path, int count)
-    {
-        var directoryInfo = new DirectoryInfo(path);
-        for (int i = 0; i < count && directoryInfo.Parent != null; i++)
-        {
-            directoryInfo = directoryInfo.Parent;
-        }
-        return directoryInfo.FullName;
-    }
 
-    public static void RemoveReadOnly(string file)
+    private static void RemoveReadOnly(string file)
     {
         try
         {
-            if (!File.Exists(file))
-                return;
-
-            var finfo = new FileInfo(file);
-            if (!finfo.IsReadOnly)
-                return;
-
-            File.SetAttributes(file, File.GetAttributes(file) & ~FileAttributes.ReadOnly);
+            DirectoryEx.RemoveReadOnly(file);
             WriteConsole($"Removed Read-Only attribute from {file}");
         }
         catch (Exception ex)
@@ -239,6 +221,7 @@ class Program
             WriteConsole(ex.Message);
         }
     }
+
     private static string? GetManifestDirectory(GameInfo game)
     {
         try
@@ -251,7 +234,7 @@ class Program
             {
                 WriteConsole($"File was ran from the game directory, using {Environment.CurrentDirectory}");
 
-                var fullPath = Path.Combine(TraverseDirectory(Environment.CurrentDirectory, 2), fileName);
+                var fullPath = Path.Combine(DirectoryEx.TraverseDirectory(Environment.CurrentDirectory, 2), fileName);
                 if (File.Exists(fullPath))
                     return fullPath;
             }
@@ -260,7 +243,7 @@ class Program
             string? installDir = null;
             foreach (var registryKeyPath in game.RegistryLocations)
             {
-                installDir = GetInstallDirFromRegistry(registryKeyPath);
+                installDir = RegistryEx.GetInstallDir(registryKeyPath);
                 if (!string.IsNullOrEmpty(installDir))
                 {
                     break;
@@ -273,8 +256,8 @@ class Program
                 return null;
             }
             
-            // Construct the path to the Steam manifest file
-            string steamManifestPath = Path.Combine(TraverseDirectory(installDir, 2), fileName);
+            // Construct the path to the Steam manifest file two folders up
+            string steamManifestPath = Path.Combine(DirectoryEx.TraverseDirectory(installDir, 2), fileName);
 
             if (!File.Exists(steamManifestPath))
             {
@@ -288,8 +271,8 @@ class Program
             WriteConsole(ex.Message, ConsoleColor.Red, false);
             return null;
         }
-    }
-    private const string InputHeader = "\t\t\t\t> ";
+    }    
+
     private static void PatchAcf(GameInfo? game)
     {
         var steamManifestPath = 
@@ -403,10 +386,10 @@ class Program
         if (missingDepots.Any())
         {
             WriteConsole();
-            WriteConsole("===============================================================");
+            WriteConsole(divider);
             WriteConsole($"The following Depots were found in your ACF but not defined in the patch.");
             WriteConsole($"This is not an error but information in case the patch doesn't work");
-            WriteConsole("===============================================================");
+            WriteConsole(divider);
             WriteConsole();
             foreach (var depot in missingDepots)
             {
@@ -419,7 +402,7 @@ class Program
 
                 WriteConsole(sb.ToString(), ConsoleColor.Gray);
             }
-            WriteConsole("===============================================================");
+            WriteConsole(divider);
             WriteConsole();
         }
         string? steamFilePath = null;
@@ -440,7 +423,7 @@ class Program
             WriteConsole($"Created Backup File: {backupFile}", center: false);
 
             WriteConsole("Shutting down steam");
-            steamFilePath = KillProcess("Steam");
+            steamFilePath = ProcessEx.KillProcess("Steam");
             steamKilled = !string.IsNullOrEmpty(steamFilePath);
             if (!steamKilled && File.Exists(acf.LauncherPath))
                 steamFilePath = acf.LauncherPath;
@@ -460,15 +443,15 @@ class Program
                 File.Copy(steamManifestPath, backupFile, true);
             }
             SetReadOnly(steamManifestPath);
-            steamRestarted = RestartSteam(steamFilePath);
+            steamRestarted = ProcessEx.RestartSteam(steamFilePath);
         }
 
         WriteConsole($"Manifest file {(hasChanges ? "updated successfully" : "required no changes (file was not patched)")}", ConsoleColor.Green);
         if (steamKilled)
             WriteConsole(steamRestarted ? "Steam has been restarted" : "Could not start steam, please launch manually");
-    }
-    private static List<string> Output = new List<string>();
-    private static void WriteConsole(string? message = null, ConsoleColor? c = null, bool center = true)
+    }    
+
+    public static void WriteConsole(string? message = null, ConsoleColor? c = null, bool center = true)
     {
         try
         {
@@ -485,68 +468,9 @@ class Program
                 Console.ResetColor();
             Output.Add(message.Trim('\t'));
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Console.WriteLine(message);
         }
-    }
-
-    private static string? KillProcess(string name)
-    {
-        foreach (var p in Process.GetProcessesByName(name))
-        {
-            try
-            {
-                var file = p?.MainModule?.FileName;
-                p?.Kill();
-                return file;
-            }
-            catch(Exception ex)
-            {
-                WriteConsole(ex.Message);
-            }
-        }
-        return null;
-    }
-    private static bool RestartSteam(string filePath)
-    {
-        if (filePath != null && File.Exists(filePath))
-        {
-            WriteConsole("Starting Steam");
-            Process.Start(filePath);
-            return true;
-        }
-        else
-        {
-            var steamLocs = new[] { "C:\\Program Files (x86)\\Steam\\steam.exe", "C:\\Program Files\\Steam\\Steam.exe" };
-            foreach (var location in steamLocs)
-            {
-                if (File.Exists(location))
-                {
-                    WriteConsole("Starting Steam");
-                    Process.Start("C:\\Program Files\\Steam\\Steam.exe");
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-    static string? GetInstallDirFromRegistry(string registryKeyPath)
-    {
-        try
-        {
-            using (var key = Registry.LocalMachine.OpenSubKey(registryKeyPath))
-            {
-                if (key != null)
-                {
-                    return key.GetValue("installed path")?.ToString() ?? key.GetValue("InstallLocation")?.ToString();                    
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            WriteConsole($"Error reading registry: {ex.Message}");
-        }
-        return null;
     }
 }
