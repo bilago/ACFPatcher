@@ -157,7 +157,7 @@ class Program
                 WriteConsole();
                 ReplaceFile(selectedBackup.FullName, manifestFile);
                 WriteConsole("File has been restored! Restarting steam");
-                if (!StartProcess(ProcessEx.KillProcess("Steam")))
+                if (!ProcessEx.StartProcess(ProcessEx.KillProcess("Steam")))
                     WriteConsole("Could not start steam", ConsoleColor.Red);
             }
         }
@@ -172,19 +172,6 @@ class Program
         RemoveReadOnly(destination);
         File.Copy(file, destination, true);
         SetReadOnly(destination);
-    }
-
-    private static bool StartProcess(string? filePath)
-    {
-        try
-        {
-            if (filePath is null) return false;
-            if (!File.Exists(filePath)) return false;
-            Process.Start(filePath);
-            return true;
-        }
-        catch
-        { return false; }
     }
 
     private static bool AreYouSure()

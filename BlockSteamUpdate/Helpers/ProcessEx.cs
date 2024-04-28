@@ -4,6 +4,18 @@ namespace SteamDisableGameUpdateTool.Helpers
 {
     internal class ProcessEx
     {
+        public static bool StartProcess(string? filePath)
+        {
+            try
+            {
+                if (filePath is null) return false;
+                if (!File.Exists(filePath)) return false;
+                Process.Start(filePath);
+                return true;
+            }
+            catch
+            { return false; }
+        }
         public static string? KillProcess(string name)
         {
             foreach (var p in Process.GetProcessesByName(name))
