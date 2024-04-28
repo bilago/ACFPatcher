@@ -1,0 +1,23 @@
+{
+  "Name": "Fallout 4: Creation Kit",
+  "Binary": "Fallout4.exe",
+  "AppId": "1946160",
+  "RegistryLocations": [
+    "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 1946160",
+    "SOFTWARE\\WOW6432Node\\Bethesda Softworks\\Fallout4"
+  ],
+  "Main": {
+    "buildid": "14160628",
+    "AutoUpdateBehavior": "1",
+    "ScheduledAutoUpdate": "0"
+  },
+  "DepotManifests": {
+    "1946161": "9088952319842378168",
+    "1946162": "8642817473480681978"
+  },
+  "MandatoryDepots": [
+    "1946161",
+    "1946162"
+  ],
+  "LanguageDepots": {}
+}
