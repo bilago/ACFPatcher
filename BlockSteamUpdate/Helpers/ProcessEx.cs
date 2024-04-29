@@ -34,7 +34,7 @@ namespace SteamDisableGameUpdateTool.Helpers
             return null;
         }
 
-        public static bool RestartSteam(string filePath)
+        public static bool RestartSteam(string? filePath)
         {
             if (filePath != null && File.Exists(filePath))
             {

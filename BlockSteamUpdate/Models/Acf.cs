@@ -269,68 +269,66 @@ public class AppState
                 if (keyValue.Value is not null)
                 {
                     main[key] = keyValue.Value;
+                    continue;
                 }
-                else
+                var bracketCount = 0;
+                switch (key)
                 {
-                    var bracketCount = 0;
-                    switch (key)
-                    {
-                        case "InstalledDepots":
-                            string? currentDepoId = null;
-                            while ((line = reader?.ReadLine()) != null)
+                    case "InstalledDepots":
+                        string? currentDepoId = null;
+                        while ((line = reader?.ReadLine()) != null)
+                        {
+                            if (line.Contains('{'))
                             {
-                                if (line.Contains('{'))
-                                {
-                                    bracketCount++;
-                                    continue;
-                                }
-                                else if (line.Contains('}'))
-                                {
-                                    bracketCount--;
-                                    if (bracketCount == 0)
-                                        break;
-                                    continue;
-                                }
-
-                                var kv = ToKVP(line);
-                                var k = kv.Key;
-                                if (kv.Value is null)
-                                {
-                                    currentDepoId = k;
-                                    continue;
-                                }
-                                if (currentDepoId is null)
-                                    continue;
-                                var v = kv.Value;
-                                if (!installedDepots.ContainsKey(currentDepoId))
-                                    installedDepots[currentDepoId] = new();
-                                switch (k)
-                                {
-                                    case "manifest":
-                                        installedDepots[currentDepoId].manifest = v;
-                                        break;
-                                    case "size":
-                                        installedDepots[currentDepoId].size = v;
-                                        break;
-                                    case "dlcappid":
-                                        installedDepots[currentDepoId].dlcappid = v;
-                                        break;
-                                }
+                                bracketCount++;
+                                continue;
                             }
-                            break;
-                        case "UserConfig":
-                            ParseDictionary(reader, userConfig);
-                            break;
-                        case "SharedDepots":
-                            ParseDictionary(reader, sharedDepots);
-                            break;
-                        case "MountedConfig":
-                            ParseDictionary(reader, mountedConfig);
-                            break;
-                        case "InstallScripts":
-                            ParseDictionary(reader, installScripts);
-                            break;
-                    }
+                            else if (line.Contains('}'))
+                            {
+                                bracketCount--;
+                                if (bracketCount == 0)
+                                    break;
+                                continue;
+                            }
+
+                            var kv = ToKVP(line);
+                            var k = kv.Key;
+                            if (kv.Value is null)
+                            {
+                                currentDepoId = k;
+                                continue;
+                            }
+                            if (currentDepoId is null)
+                                continue;
+                            var v = kv.Value;
+                            if (!installedDepots.ContainsKey(currentDepoId))
+                                installedDepots[currentDepoId] = new();
+                            switch (k)
+                            {
+                                case "manifest":
+                                    installedDepots[currentDepoId].manifest = v;
+                                    break;
+                                case "size":
+                                    installedDepots[currentDepoId].size = v;
+                                    break;
+                                case "dlcappid":
+                                    installedDepots[currentDepoId].dlcappid = v;
+                                    break;
+                            }
+                        }
+                        break;
+                    case "UserConfig":
+                        ParseDictionary(reader, userConfig);
+                        break;
+                    case "SharedDepots":
+                        ParseDictionary(reader, sharedDepots);
+                        break;
+                    case "MountedConfig":
+                        ParseDictionary(reader, mountedConfig);
+                        break;
+                    case "InstallScripts":
+                        ParseDictionary(reader, installScripts);
+                        break;
                 }
             }
 
@@ -344,7 +342,7 @@ public class AppState
         }
         catch(Exception ex)
         {
-            Console.WriteLine(ex);
+            Program.WriteConsole(ex.Message, ConsoleColor.Red);
             return null;
         }
     }

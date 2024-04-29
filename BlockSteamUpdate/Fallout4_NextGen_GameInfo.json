@@ -9,57 +9,223 @@
   "Main": {
     "buildid": "14160910",
     "AutoUpdateBehavior": "1",
-    "ScheduledAutoUpdate": "0"
+    "ScheduledAutoUpdate": "0",
+    "StateFlags": "4",
+    "UpdateResult": "0",
+    "TargetBuildID": "0"
   },
-  "DepotManifests": {
-    "377161": "7332110922360867314",
-    "377162": "3747866029627240371",
-    "377163": "3876298980394425306",
-    "377164": "8492427313392140315",
-    "435870": "1213339795579796878",
-    "435871": "7785009542965564688",
-    "435880": "366079256218893805",
-    "393880": "4656512446653497676",
-    "393884": "6797758859461570066",
-    "393882": "8191305962459798887",
-    "377166": "5181861686732774133",
-    "377168": "2941745134283711063",
-    "393883": "8665224215527782698",
-    "377165": "8045191663392248690",
-    "404091": "1644608195071865486",
-    "435877": "7266521576458366233",
-    "435878": "2863491461978199343",
-    "435879": "2755212490240557490",
-    "435873": "7032871961633882628",
-    "435874": "3456890184317469397",
-    "435875": "3302169299215915593",
-    "435876": "3855123742386435744",
-    "435872": "7005875929366232340",
-    "377167": "6159581842674600625"
-  },
-  "MandatoryDepots": [
-    "377161",
-    "377162",
-    "377163"
+  "DepotManifests": [
+    {
+      "DepotId": "377161",
+      "ManifestId": "7332110922360867314",
+      "Mandatory": true,
+      "Language": null
+    },
+    {
+      "DepotId": "377162",
+      "ManifestId": "3747866029627240371",
+      "Mandatory": true,
+      "Language": null
+    },
+    {
+      "DepotId": "377163",
+      "ManifestId": "3876298980394425306",
+      "Mandatory": true,
+      "Language": null
+    },
+    {
+      "DepotId": "377164",
+      "ManifestId": "8492427313392140315",
+      "Mandatory": false,
+      "Language": "English"
+    },
+    {
+      "DepotId": "435870",
+      "ManifestId": "1213339795579796878",
+      "Mandatory": false,
+      "Language": null
+    },
+    {
+      "DepotId": "435871",
+      "ManifestId": "7785009542965564688",
+      "Mandatory": false,
+      "Language": null
+    },
+    {
+      "DepotId": "435880",
+      "ManifestId": "366079256218893805",
+      "Mandatory": false,
+      "Language": null
+    },
+    {
+      "DepotId": "393880",
+      "ManifestId": "4656512446653497676",
+      "Mandatory": false,
+      "Language": "Polish"
+    },
+    {
+      "DepotId": "393881",
+      "ManifestId": "9220466047319762009",
+      "Mandatory": false,
+      "Language": "Russian"
+    },
+    {
+      "DepotId": "393884",
+      "ManifestId": "6797758859461570066",
+      "Mandatory": false,
+      "Language": "Japanese"
+    },
+    {
+      "DepotId": "393882",
+      "ManifestId": "8191305962459798887",
+      "Mandatory": false,
+      "Language": "Portuguese"
+    },
+    {
+      "DepotId": "377166",
+      "ManifestId": "5181861686732774133",
+      "Mandatory": false,
+      "Language": "German"
+    },
+    {
+      "DepotId": "377168",
+      "ManifestId": "2941745134283711063",
+      "Mandatory": false,
+      "Language": "Spanish"
+    },
+    {
+      "DepotId": "393883",
+      "ManifestId": "8665224215527782698",
+      "Mandatory": false,
+      "Language": "Chinese"
+    },
+    {
+      "DepotId": "377165",
+      "ManifestId": "8045191663392248690",
+      "Mandatory": false,
+      "Language": "French"
+    },
+    {
+      "DepotId": "404091",
+      "ManifestId": "1644608195071865486",
+      "Mandatory": false,
+      "Language": "Japanese"
+    },
+    {
+      "DepotId": "435877",
+      "ManifestId": "7266521576458366233",
+      "Mandatory": false,
+      "Language": "Russian"
+    },
+    {
+      "DepotId": "435878",
+      "ManifestId": "2863491461978199343",
+      "Mandatory": false,
+      "Language": "Portuguese"
+    },
+    {
+      "DepotId": "435879",
+      "ManifestId": "2755212490240557490",
+      "Mandatory": false,
+      "Language": "Chinese"
+    },
+    {
+      "DepotId": "435873",
+      "ManifestId": "7032871961633882628",
+      "Mandatory": false,
+      "Language": "German"
+    },
+    {
+      "DepotId": "435874",
+      "ManifestId": "3456890184317469397",
+      "Mandatory": false,
+      "Language": "Italian"
+    },
+    {
+      "DepotId": "435875",
+      "ManifestId": "3302169299215915593",
+      "Mandatory": false,
+      "Language": "Spanish"
+    },
+    {
+      "DepotId": "435876",
+      "ManifestId": "3855123742386435744",
+      "Mandatory": false,
+      "Language": "Polish"
+    },
+    {
+      "DepotId": "435872",
+      "ManifestId": "7005875929366232340",
+      "Mandatory": false,
+      "Language": "French"
+    },
+    {
+      "DepotId": "377167",
+      "ManifestId": "6159581842674600625",
+      "Mandatory": false,
+      "Language": "Italian"
+    }
   ],
-  "LanguageSpecificDepots": {
-    "377164": "English",
-    "393880": "Polish",
-    "393884": "Japanese",
-    "393882": "Portuguese",
-    "377166": "German",
-    "377168": "Spanish",
-    "393883": "Chinese",
-    "377165": "French",
-    "377167": "Italian"
-  },
   "DLCDepots": {
-    "435870": "Automatron",
-    "435880": "Wasteland Workshop",
-    "435881": "Far Harbor",
-    "480630": "Contraptions Workshop",
-    "480631": "Vault-Tec Workshop",
-    "490650": "Nuka-World",
-    "540810": "Terrapin"
+    "Automatron": [
+      "435870",
+      "435872",
+      "435876",
+      "435875",
+      "435874",
+      "435873",
+      "435879",
+      "404091",
+      "435877",
+      "435878"
+    ],
+    "Wasteland Workshop": [
+      "435880"
+    ],
+    "Far Harbor": [
+      "435881",
+      "435882",
+      "435883",
+      "435884",
+      "435885",
+      "435886",
+      "435887",
+      "435888",
+      "435889",
+      "404092",
+      "404093"
+    ],
+    "Contraptions Workshop": [
+      "480630"
+    ],
+    "Vault-Tec Workshop": [
+      "480631",
+      "393885",
+      "393886",
+      "393887",
+      "393888",
+      "393889",
+      "393890",
+      "393891",
+      "393892",
+      "393893",
+      "393894"
+    ],
+    "Nuka-World": [
+      "490650",
+      "393895",
+      "393896",
+      "393897",
+      "377169",
+      "393898",
+      "393898",
+      "393899",
+      "404094",
+      "404095",
+      "404096"
+    ],
+    "Terrapin": [
+      "540810"
+    ]
   }
 }

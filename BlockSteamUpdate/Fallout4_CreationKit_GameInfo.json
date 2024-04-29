@@ -9,15 +9,25 @@
   "Main": {
     "buildid": "14160628",
     "AutoUpdateBehavior": "1",
-    "ScheduledAutoUpdate": "0"
+    "ScheduledAutoUpdate": "0",
+    "StateFlags": "4",
+    "UpdateResult": "0",
+    "TargetBuildID": "0"
   },
-  "DepotManifests": {
-    "1946161": "9088952319842378168",
-    "1946162": "8642817473480681978"
-  },
-  "MandatoryDepots": [
-    "1946161",
-    "1946162"
+  "DepotManifests": [
+    {
+      "DepotId": "1946161",
+      "ManifestId": "7332110922360867314",
+      "Mandatory": true,
+      "Language": null
+    },
+    {
+      "DepotId": "1946162",
+      "ManifestId": "3747866029627240371",
+      "Mandatory": true,
+      "Language": null
+    }
   ],
-  "LanguageDepots": {}
+  "DLCDepots": {
+  }
 }

@@ -1,16 +1,14 @@
-﻿using Microsoft.Win32;
-using SteamDisableGameUpdateTool.Helpers;
+﻿using SteamDisableGameUpdateTool.Helpers;
 using SteamSkipNextGenUpdate.Models;
-using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 
 class Program
 {
     private const string divider = "===============================================================";
-    private const string InputHeader = "\t\t\t\t> ";
-    private static string LogFile = $"AcfPatchTool_{DateTime.Now:MM-dd-yyyy hhmmss}.log";
-    private const int IndentCount = 4;
+    private const string InputHeader = "\t\t\t> ";
+    private static string LogFile = $"AcfPatchTool_{DateTime.Now:MM-dd-yyyy_hhmmss}.log";
+    private const int IndentCount = 3;
     private static List<string> Output = new();
     
     static void Main(string[] args)
@@ -66,13 +64,15 @@ class Program
                             var selection = int.Parse(c.ToString());
                             if (selection > gameList.Count || selection < 1)
                             {
-                                WriteConsole("\nInvalid selection, please try again");
+                                WriteConsole();
+                                WriteConsole("Invalid selection, please try again", ConsoleColor.Yellow);
                                 continue;
                             }
                             selectedGame = gameDict[gameList[selection - 1]];
                             break;
                         default:
-                            WriteConsole("\nInvalid selection, please try again");
+                            WriteConsole();
+                            WriteConsole("Invalid selection, please try again", ConsoleColor.Yellow);
                             continue;
                     }
                     WriteConsole();
@@ -300,10 +300,8 @@ class Program
         var acf = AppState.Deserialize(steamManifestPath);
         if (acf is null)
         {
-            WriteConsole("Error Deserializing File, cannot be patched. \nAborting progress, no changes have been made. Try using the manual method instead.", ConsoleColor.Red, false);
-            WriteConsole("Press Any key to continue");
-            Console.ReadKey();
-            return;
+            WriteConsole("Error Deserializing File, cannot be patched.", ConsoleColor.Red, false);
+            throw new Exception("Aborting progress, no changes have been made. Try using the manual method instead.");
         }
 
 
@@ -329,25 +327,24 @@ class Program
             }
         }
         var depoCount = 0;
-        var languageDepotFound = game.LanguageSpecificDepots.Count == 0;
+        var languageDepotFound = !game.DepotManifests.Any(x => x.IsLanguage);
         foreach (var item in game.DepotManifests)
         {
-            var isMandatory = game.MandatoryDepots.Contains(item.Key);
-            var isLanguageDepot = game.LanguageSpecificDepots.ContainsKey(item.Key);
-            var isDlcDepot = game.DLCDepots.ContainsKey(item.Key);
-            if (acf.InstalledDepots.TryGetValue(item.Key, out var val))
+            if (item.DepotId is null) continue;
+            if (item.ManifestId is null) continue;
+            if (acf.InstalledDepots.TryGetValue(item.DepotId, out var val))
             {
                 //at least one language depot found
-                if (isLanguageDepot)
+                if (item.IsLanguage)
                 {
-                    WriteConsole($"Language Depot found in acf: {game.LanguageSpecificDepots[item.Key]}: {item.Key}", ConsoleColor.Green);
+                    WriteConsole($"Language Depot found in acf: {item.Language}: {item.DepotId}", ConsoleColor.Green);
                     languageDepotFound = true;
                 }
 
-                if (val.manifest != item.Value)
+                if (val.manifest != item.ManifestId)
                 {
-                    WriteConsole($"Changed DepotManifest value for {item.Key} from {val.manifest} to {item.Value}", ConsoleColor.Green);
-                    acf.InstalledDepots[item.Key].manifest = item.Value;
+                    WriteConsole($"Changed DepotManifest value for {item.DepotId} from {val.manifest} to {item.ManifestId}", ConsoleColor.Green);
+                    acf.InstalledDepots[item.DepotId].manifest = item.ManifestId;
                     depoCount++;
                     hasChanges = true;
                 }
@@ -355,41 +352,46 @@ class Program
             }
             else
             {
-                if (isLanguageDepot)
+                //dont log missing languages here
+                if (item.IsLanguage)
                     continue;
-                else if (isMandatory)
-                    WriteConsole($"Depot {item.Key} was missing from your acf file. This patch might not be compatible with your version", ConsoleColor.Red, false);
-                else if (isDlcDepot)
+
+                var dlc = game.GetDlcName(item.DepotId);
+                if(item.Mandatory)
                 {
-                    WriteConsole($"Depot {item.Key} is missing from your acf file, this is for the DLC: {game.DLCDepots[item.Key]}", ConsoleColor.Yellow, false);
+                    throw new Exception($"Depot {item.DepotId} {(dlc != null ? $"DLC: {dlc} " : "")}is missing from your acf file and is flagged as Mandatory, This patch is not compatible with your acf");
+                }    
+                if (dlc != null)
+                {
+                    WriteConsole($"Depot {item.DepotId} is missing from your acf file, this is for the DLC: {dlc}", ConsoleColor.Yellow, false);
                     WriteConsole($"If you do not own this DLC, this is not an error", ConsoleColor.Yellow, false);
                 }
                 else
-                    WriteConsole($"Skipping Depot {item.Key}. Missing from your ACF but not required", ConsoleColor.Gray);
+                    WriteConsole($"Skipping Depot {item.DepotId}. Missing from your ACF but not required", ConsoleColor.Gray);
             }
         }
         if (!languageDepotFound)
             WriteConsole($"No language depot for {game.Name} in your acf file. This patch might not be compatible with your version", ConsoleColor.Red, false);
-        var missingDepots = acf.InstalledDepots.Where(x => !game.DepotManifests.ContainsKey(x.Key));
+        var missingDepots = acf.InstalledDepots.Where(x => !game.DepotManifests.Any(y => y.DepotId == x.Key));
         if (missingDepots.Any())
         {
             WriteConsole();
             WriteConsole(divider);
             WriteConsole($"The following Depots were found in your ACF but not defined in the patch.");
-            WriteConsole($"This is not an error but information in case the patch doesn't work");
+            WriteConsole($"This is not always an error but useful information in case the patch doesn't work");
             WriteConsole(divider);
             WriteConsole();
             foreach (var depot in missingDepots)
             {
                 var sb = new StringBuilder();
                 sb.Append($"DepotId: {depot.Key} Manifest: {depot.Value.manifest}");
-                if (game.DLCDepots.TryGetValue(depot.Key, out var dlcName))
-                    sb.Append($" DLC: {dlcName}");
-                if (game.LanguageSpecificDepots.TryGetValue(depot.Key, out var language))
-                    sb.Append($" Language: {language}");
+                var dlc = game.GetDlcName(depot.Key);
+                if (dlc != null)
+                    sb.Append($" DLC: {dlc} (No Patch Needed)");
 
                 WriteConsole(sb.ToString(), ConsoleColor.Gray);
             }
+            WriteConsole();
             WriteConsole(divider);
             WriteConsole();
         }
@@ -434,7 +436,7 @@ class Program
             steamRestarted = ProcessEx.RestartSteam(steamFilePath);
         }
 
-        WriteConsole($"Manifest file {(hasChanges ? "updated successfully" : "required no changes (file was not patched)")}", ConsoleColor.Green);
+        WriteConsole($"Manifest file {(hasChanges ? "updated successfully" : "required no changes (file already patched?)")}", ConsoleColor.Green);
         if (steamKilled)
             WriteConsole(steamRestarted ? "Steam has been restarted" : "Could not start steam, please launch manually");
     }    
@@ -456,7 +458,7 @@ class Program
                 Console.ResetColor();
             Output.Add(message.Trim('\t'));
         }
-        catch (Exception ex)
+        catch
         {
             Console.WriteLine(message);
         }
