@@ -7,7 +7,7 @@
     "SOFTWARE\\WOW6432Node\\Bethesda Softworks\\Fallout4"
   ],
   "Main": {
-    "buildid": "14160628",
+    "buildid": "14225750",
     "AutoUpdateBehavior": "1",
     "ScheduledAutoUpdate": "0",
     "StateFlags": "4",
@@ -17,13 +17,13 @@
   "DepotManifests": [
     {
       "DepotId": "1946161",
-      "ManifestId": "7332110922360867314",
+      "ManifestId": "3810583382935075576",
       "Mandatory": true,
       "Language": null
     },
     {
       "DepotId": "1946162",
-      "ManifestId": "3747866029627240371",
+      "ManifestId": "5337866012219044366",
       "Mandatory": true,
       "Language": null
     }

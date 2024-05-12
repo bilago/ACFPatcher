@@ -10,7 +10,7 @@ class Program
     private static string LogFile = $"AcfPatchTool_{DateTime.Now:MM-dd-yyyy_hhmmss}.log";
     private const int IndentCount = 3;
     private static List<string> Output = new();
-    
+    private const string acfLocationName = "steamapps";
     static void Main(string[] args)
     {
         try
@@ -23,13 +23,17 @@ class Program
                 try
                 {
                     var game = GameInfo.FromFile(file);
-                    if (game?.Name is null) continue;
+                    if (game?.Name is null)
+                    {
+                        WriteConsole($"Unable to parse {file} due to unknown reason", ConsoleColor.Yellow);
+                        continue;
+                    }
                     gameDict[game.Name] = game;
                     gameList.Add(game.Name);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    WriteConsole($"{file} cannot be read. Please download the patch tool again or replace this file with a working one. {ex.Message}", ConsoleColor.Red, false);
+                    WriteConsole($"File: {file}. {ex.Message}", ConsoleColor.Red, false);
                 }
             }
             try
@@ -112,7 +116,7 @@ class Program
         }
     }    
 
-    private static void RestoreBacup(List<FileInfo> backFiles, string manifestFile)
+    private static void RestoreBackup(List<FileInfo> backFiles, string manifestFile)
     {
         try
         {
@@ -218,11 +222,11 @@ class Program
                 return null;
             var fileName =$"appmanifest_{game.AppId}.acf";
             var pathReplaceStr = $"common\\{game.Name}";
-            if (File.Exists(game.Binary) && Environment.CurrentDirectory.Contains("steamapps"))
+            if (File.Exists(game.Binary) && Environment.CurrentDirectory.Contains(acfLocationName))
             {
                 WriteConsole($"File was ran from the game directory, using {Environment.CurrentDirectory}");
 
-                var fullPath = Path.Combine(DirectoryEx.TraverseDirectory(Environment.CurrentDirectory, 2), fileName);
+                var fullPath = Path.Combine(DirectoryEx.TraverseDirectory(Environment.CurrentDirectory, acfLocationName), fileName);
                 if (File.Exists(fullPath))
                     return fullPath;
             }
@@ -245,7 +249,7 @@ class Program
             }
             
             // Construct the path to the Steam manifest file two folders up
-            string steamManifestPath = Path.Combine(DirectoryEx.TraverseDirectory(installDir, 2), fileName);
+            string steamManifestPath = Path.Combine(DirectoryEx.TraverseDirectory(installDir, acfLocationName), fileName);
 
             if (!File.Exists(steamManifestPath))
             {
@@ -287,7 +291,7 @@ class Program
         switch (key)
         {
             case ConsoleKey.R:
-                RestoreBacup(backFiles, steamManifestPath);
+                RestoreBackup(backFiles, steamManifestPath);
                 return;
             case ConsoleKey.Y:
                 break;

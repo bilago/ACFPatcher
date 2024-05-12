@@ -1,0 +1,39 @@
+{
+  "Name": "The Elder Scrolls V: Skyrim Special Edition",
+  "Binary": "SkyrimSE.exe",
+  "AppId": "489830",
+  "RegistryLocations": [
+    "SOFTWARE\\WOW6432Node\\Bethesda Softworks\\Skyrim Special Edition",
+    "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 489830"
+  ],
+  "Main": {
+    "buildid": "14160628",
+    "AutoUpdateBehavior": "1",
+    "ScheduledAutoUpdate": "0",
+    "StateFlags": "4",
+    "UpdateResult": "0",
+    "TargetBuildID": "0"
+  },
+  "DepotManifests": [
+    {
+      "DepotId": "489831",
+      "ManifestId": "8442952117333549665",
+      "Mandatory": true,
+      "Language": null
+    },
+    {
+      "DepotId": "489832",
+      "ManifestId": "8042843504692938467",
+      "Mandatory": true,
+      "Language": null
+    },
+    {
+      "DepotId": "489833",
+      "ManifestId": "1914580699073641964",
+      "Mandatory": true,
+      "Language": null
+    }
+  ],
+  "DLCDepots": {
+  }
+}

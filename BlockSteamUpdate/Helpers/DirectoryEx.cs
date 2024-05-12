@@ -17,10 +17,10 @@
             File.SetAttributes(file, attr);
         }
 
-        public static string TraverseDirectory(string path, int count)
+        public static string TraverseDirectory(string path, string name)
         {
             var directoryInfo = new DirectoryInfo(path);
-            for (int i = 0; i < count && directoryInfo.Parent != null; i++)
+            while (!directoryInfo.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && directoryInfo.Parent != null)
             {
                 directoryInfo = directoryInfo.Parent;
             }

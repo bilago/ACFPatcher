@@ -6,8 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <ApplicationIcon>Fallout4Launcher_246.ico</ApplicationIcon>
-    <AssemblyVersion>1.0.0.11</AssemblyVersion>
-    <NeutralLanguage>af-ZA</NeutralLanguage>    
+    <AssemblyVersion>1.0.0.14</AssemblyVersion>
+    <NeutralLanguage>en-US</NeutralLanguage>    
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -27,6 +27,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Fallout4_CreationKit_GameInfo.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="SkyrimSE_GameInfo.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

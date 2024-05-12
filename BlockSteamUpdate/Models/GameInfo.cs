@@ -23,17 +23,10 @@ namespace SteamSkipNextGenUpdate.Models
         }
         public static GameInfo? FromFile(string filename)
         {
-            try
-            {
-                if (!File.Exists(filename))
-                    return null;
-                var content = File.ReadAllText(filename);
-                return JsonSerializer.Deserialize<GameInfo>(content);
-            }
-            catch
-            {
+            if (!File.Exists(filename))
                 return null;
-            }
+            var content = File.ReadAllText(filename);
+            return JsonSerializer.Deserialize<GameInfo>(content);
         }
     }
 }
