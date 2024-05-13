@@ -1,0 +1,318 @@
+{
+  "Name": "The Elder Scrolls V: Skyrim",
+  "Binary": "SkyrimLauncher.exe",
+  "AppId": "72850",
+  "RegistryLocations": [
+    "SOFTWARE\\WOW6432Node\\Bethesda Softworks\\skyrim",
+    "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 72850"
+  ],
+  "Main": {
+    "buildid": "595133",
+    "AutoUpdateBehavior": "1",
+    "ScheduledAutoUpdate": "0",
+    "StateFlags": "4",
+    "UpdateResult": "0",
+    "TargetBuildID": "0"
+  },
+  "DepotManifests": [
+    {
+      "DepotId": "72852",
+      "ManifestId": "5176728229505148062",
+      "Mandatory": true,
+      "Language": null
+    },
+    {
+      "DepotId": "72851",
+      "ManifestId": "430694959351693705",
+      "Mandatory": true,
+      "Language": null
+    },
+    {
+      "DepotId": "72853",
+      "ManifestId": "3817241784354177437",
+      "Mandatory": false,
+      "Language": "English"
+    },
+    {
+      "DepotId": "202485",
+      "ManifestId": "3360479978025462854",
+      "Mandatory": false,
+      "Language": null
+    },
+    {
+      "DepotId": "226880",
+      "ManifestId": "7775806625498321311",
+      "Mandatory": false,
+      "Language": null
+    },
+    {
+      "DepotId": "220760",
+      "ManifestId": "11352126252031938",
+      "Mandatory": false,
+      "Language": null
+    },
+    {
+      "DepotId": "211720",
+      "ManifestId": "8455218688827025070",
+      "Mandatory": false,
+      "Language": null
+    },
+    {
+      "DepotId": "72854",
+      "ManifestId": "8536776159703700962",
+      "Mandatory": false,
+      "Language": "French"
+    },
+    {
+      "DepotId": "72855",
+      "ManifestId": "8336308487219764706",
+      "Mandatory": false,
+      "Language": "Italian"
+    },
+    {
+      "DepotId": "72856",
+      "ManifestId": "7571347636235492823",
+      "Mandatory": false,
+      "Language": "German"
+    },
+    {
+      "DepotId": "72857",
+      "ManifestId": "3378365140534247703",
+      "Mandatory": false,
+      "Language": "Spanish"
+    },
+    {
+      "DepotId": "72858",
+      "ManifestId": "7838100264460942831",
+      "Mandatory": false,
+      "Language": "Polish"
+    },
+    {
+      "DepotId": "72859",
+      "ManifestId": "5471547594501309345",
+      "Mandatory": false,
+      "Language": "Czech"
+    },
+    {
+      "DepotId": "72860",
+      "ManifestId": "5193644833404975611",
+      "Mandatory": false,
+      "Language": "Russian"
+    },
+    {
+      "DepotId": "72861",
+      "ManifestId": "400878757036949667",
+      "Mandatory": false,
+      "Language": "Japanese"
+    },
+    {
+      "DepotId": "211721",
+      "ManifestId": "8491601813494771150",
+      "Mandatory": false,
+      "Language": "French"
+    },
+    {
+      "DepotId": "211722",
+      "ManifestId": "1022735717219821693",
+      "Mandatory": false,
+      "Language": "Italian"
+    },
+    {
+      "DepotId": "211723",
+      "ManifestId": "1086946781294420899",
+      "Mandatory": false,
+      "Language": "German"
+    },
+    {
+      "DepotId": "211724",
+      "ManifestId": "1276143862192158998",
+      "Mandatory": false,
+      "Language": "Spanish"
+    },
+    {
+      "DepotId": "211725",
+      "ManifestId": "8299795016551985184",
+      "Mandatory": false,
+      "Language": "Japanese"
+    },
+    {
+      "DepotId": "211726",
+      "ManifestId": "5289416362846105567",
+      "Mandatory": false,
+      "Language": "Czech"
+    },
+    {
+      "DepotId": "211727",
+      "ManifestId": "7751553359064521832",
+      "Mandatory": false,
+      "Language": "Polish"
+    },
+    {
+      "DepotId": "211728",
+      "ManifestId": "4059246410413922004",
+      "Mandatory": false,
+      "Language": "Russian"
+    },
+    {
+      "DepotId": "220761",
+      "ManifestId": "2344958374935388264",
+      "Mandatory": false,
+      "Language": "French"
+    },
+    {
+      "DepotId": "220762",
+      "ManifestId": "5113555411172661886",
+      "Mandatory": false,
+      "Language": "Italian"
+    },
+    {
+      "DepotId": "220763",
+      "ManifestId": "8215433295476872627",
+      "Mandatory": false,
+      "Language": "German"
+    },
+    {
+      "DepotId": "220764",
+      "ManifestId": "7691844347959071567",
+      "Mandatory": false,
+      "Language": "Spanish"
+    },
+    {
+      "DepotId": "220765",
+      "ManifestId": "257722701370938794",
+      "Mandatory": false,
+      "Language": "Japanese"
+    },
+    {
+      "DepotId": "220766",
+      "ManifestId": "931899454736580467",
+      "Mandatory": false,
+      "Language": "Czech"
+    },
+    {
+      "DepotId": "220767",
+      "ManifestId": "1912731935620426238",
+      "Mandatory": false,
+      "Language": "Polish"
+    },
+    {
+      "DepotId": "220768",
+      "ManifestId": "8180020645450882851",
+      "Mandatory": false,
+      "Language": "Russian"
+    },
+    {
+      "DepotId": "226881",
+      "ManifestId": "5951986179928071119",
+      "Mandatory": false,
+      "Language": "French"
+    },
+    {
+      "DepotId": "226882",
+      "ManifestId": "1063207227414446171",
+      "Mandatory": false,
+      "Language": "Italian"
+    },
+    {
+      "DepotId": "226883",
+      "ManifestId": "2843325968068819127",
+      "Mandatory": false,
+      "Language": "German"
+    },
+    {
+      "DepotId": "226884",
+      "ManifestId": "3812267532474553905",
+      "Mandatory": false,
+      "Language": "Spanish"
+    },
+    {
+      "DepotId": "226888",
+      "ManifestId": "921222014325323019",
+      "Mandatory": false,
+      "Language": "Japanese"
+    },
+    {
+      "DepotId": "226885",
+      "ManifestId": "1585497366712628883",
+      "Mandatory": false,
+      "Language": "Czech"
+    },
+    {
+      "DepotId": "226886",
+      "ManifestId": "5952995101008705423",
+      "Mandatory": false,
+      "Language": "Polish"
+    },
+    {
+      "DepotId": "226887",
+      "ManifestId": "7536838561817009398",
+      "Mandatory": false,
+      "Language": "Russian"
+    },
+    {
+      "DepotId": "72862",
+      "ManifestId": "2225156885713950567",
+      "Mandatory": false,
+      "Language": "Chinese"
+    },
+    {
+      "DepotId": "220769",
+      "ManifestId": "2819260933799905552",
+      "Mandatory": false,
+      "Language": "Chinese"
+    },
+    {
+      "DepotId": "211729",
+      "ManifestId": "7463371072418866286",
+      "Mandatory": false,
+      "Language": "Chinese"
+    },
+    {
+      "DepotId": "226890",
+      "ManifestId": "612194655676385333",
+      "Mandatory": false,
+      "Language": "Chinese"
+    }
+  ],
+  "DLCDepots": {
+    "Dragonborn": [
+      "226880",
+      "226881",
+      "226882",
+      "226883",
+      "226884",
+      "226885",
+      "226886",
+      "226887",
+      "226888",
+      "226890"
+    ],
+    "Hearthfire": [
+      "220760",
+      "220761",
+      "220762",
+      "220763",
+      "220764",
+      "220765",
+      "220766",
+      "220767",
+      "220768",
+      "220769"
+    ],
+    "Dawngaurd": [
+      "211720",
+      "211721",
+      "211722",
+      "211723",
+      "211724",
+      "211725",
+      "211726",
+      "211727",
+      "211728",
+      "211729"
+    ],
+    "High Resolution Texture Pack": [
+      "202485"
+    ]
+  }
+}

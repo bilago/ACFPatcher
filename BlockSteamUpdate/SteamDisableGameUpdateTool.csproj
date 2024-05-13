@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <ApplicationIcon>Fallout4Launcher_246.ico</ApplicationIcon>
-    <AssemblyVersion>1.0.0.14</AssemblyVersion>
+    <AssemblyVersion>1.0.0.15</AssemblyVersion>
     <NeutralLanguage>en-US</NeutralLanguage>    
   </PropertyGroup>
 
@@ -23,6 +23,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Skyrim_GameInfo.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Fallout4_NextGen_GameInfo.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
