@@ -7,7 +7,7 @@
     "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 377160"
   ],
   "Main": {
-    "buildid": "14160910",
+    "buildid": "14349213",
     "AutoUpdateBehavior": "1",
     "ScheduledAutoUpdate": "0",
     "StateFlags": "4",
@@ -23,13 +23,13 @@
     },
     {
       "DepotId": "377162",
-      "ManifestId": "3747866029627240371",
+      "ManifestId": "5698952341602575696",
       "Mandatory": true,
       "Language": null
     },
     {
       "DepotId": "377163",
-      "ManifestId": "3876298980394425306",
+      "ManifestId": "8681102885670959037",
       "Mandatory": true,
       "Language": null
     },
